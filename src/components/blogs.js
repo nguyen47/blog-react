@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import { getBlogs } from '../services/fakeBlogService';
 import Like from '../commons/like';
-
+import Pagination from '../commons/pagination';
+import { paginate } from '../utils/paginate';
 class Blogs extends Component {
   state = {
-    blogs: getBlogs()
+    blogs: getBlogs(),
+    pageSize: 3,
+    currentPage: 1
   };
 
   render() {
@@ -13,6 +16,13 @@ class Blogs extends Component {
     if (length === 0) {
       return <p>No blog in database !</p>;
     }
+
+    const blogs = paginate(
+      this.state.blogs,
+      this.state.currentPage,
+      this.state.pageSize
+    );
+
     return (
       <React.Fragment>
         <p>There are {length} blog in database</p>
@@ -28,7 +38,7 @@ class Blogs extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.blogs.map((blog) => (
+            {blogs.map((blog) => (
               <tr key={blog._id}>
                 <th scope="row">{blog._id}</th>
                 <td>{blog.title}</td>
@@ -52,6 +62,12 @@ class Blogs extends Component {
             ))}
           </tbody>
         </table>
+        <Pagination
+          blogCounts={length}
+          pageSize={this.state.pageSize}
+          currentPage={this.state.currentPage}
+          onPageChange={this.handlePageChange}
+        />
       </React.Fragment>
     );
   }
@@ -66,6 +82,10 @@ class Blogs extends Component {
     blogs[index] = { ...blogs[index] };
     blogs[index].like = !blogs[index].like;
     this.setState({ blogs });
+  };
+
+  handlePageChange = (page) => {
+    this.setState({ currentPage: page });
   };
 }
 
