@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { getBlogs } from '../services/fakeBlogService';
+import Like from '../commons/like';
 
 class Blogs extends Component {
   state = {
@@ -15,7 +16,7 @@ class Blogs extends Component {
     return (
       <React.Fragment>
         <p>There are {length} blog in database</p>
-        <table className="table">
+        <table className="table .table-responsive">
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -23,6 +24,7 @@ class Blogs extends Component {
               <th scope="col">Genre</th>
               <th scope="col">Date Publish</th>
               <th scope="col">Action</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -32,6 +34,12 @@ class Blogs extends Component {
                 <td>{blog.title}</td>
                 <td>{blog.genre.name}</td>
                 <td>{blog.publishDate}</td>
+                <td align="center">
+                  <Like
+                    liked={blog.like}
+                    onLike={() => this.handleLike(blog)}
+                  />
+                </td>
                 <td>
                   <button
                     onClick={() => this.handleDelete(blog)}
@@ -49,6 +57,14 @@ class Blogs extends Component {
   }
   handleDelete = (blog) => {
     const blogs = this.state.blogs.filter((b) => b._id !== blog._id);
+    this.setState({ blogs });
+  };
+
+  handleLike = (blog) => {
+    const blogs = [...this.state.blogs];
+    const index = blogs.indexOf(blog);
+    blogs[index] = { ...blogs[index] };
+    blogs[index].like = !blogs[index].like;
     this.setState({ blogs });
   };
 }
